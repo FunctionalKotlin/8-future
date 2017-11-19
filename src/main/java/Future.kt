@@ -3,29 +3,19 @@
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
 
+class Future<A>(val task: ((A) -> Unit) -> Unit)
 
-class Future<A>(val task: ((A) -> Unit) -> Unit) {
-    companion object {
-        fun <A> async(getValue: () -> A): Future<A> {
-            val task: ((A) -> Unit) -> Unit = { continuation ->
-                launch(CommonPool) {
-                    continuation(getValue())
-                }
-            }
-
-            return Future(task)
+fun <A> asyncFuture(getValue: () -> A): Future<A> =
+    Future { continuation ->
+        launch(CommonPool) {
+            continuation(getValue())
         }
     }
-}
 
 fun main(args: Array<String>) {
     val getNumber = {
         23 + 19
     }
 
-    val task: ((Int) -> Unit) -> Unit = { continuation ->
-        continuation(getNumber())
-    }
-
-    val future = Future(task)
+    val future = asyncFuture { getNumber }
 }
