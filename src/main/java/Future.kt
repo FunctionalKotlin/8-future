@@ -21,8 +21,15 @@ fun <A> Future<A>.runAsync(onComplete: (A) -> Unit) {
 }
 
 fun <A, B> Future<A>.map(transform: (A) -> B): Future<B> =
+    flatMap {
+        Future(async(CommonPool) {
+            transform(it)
+        })
+    }
+
+fun <A, B> Future<A>.flatMap(transform: (A) -> Future<B>): Future<B> =
     Future(async(CommonPool) {
-        transform(this@map.task.await())
+        transform(this@flatMap.task.await()).task.await()
     })
 
 fun main(args: Array<String>) {
