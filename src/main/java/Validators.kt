@@ -1,3 +1,6 @@
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
 // Copyright © FunctionalKotlin.com 2017. All rights reserved.
 
 typealias AsyncResult<A, E> = Future<Result<A, E>>
@@ -45,4 +48,17 @@ object Validators {
     val Newsletter: Validator<User, UserError> =
         validate<User>(with = { it.newsletter })
             .orElseFail(with = UserError.MUST_BE_PREMIUM)
+
+    val Adult: Validator<LocalDate, UserError> =
+        validate<LocalDate>(with = { birthDate ->
+            val today = LocalDate.now()
+
+            ChronoUnit.YEARS.between(birthDate, today) >= 18
+        }).orElseFail(with = UserError.MUST_BE_ADULT)
+
+    val Email: Validator<String, UserError> =
+        validate<String>(with = {
+            Regex("[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
+                .matches(it)
+        }).orElseFail(with = UserError.WRONG_EMAIL)
 }

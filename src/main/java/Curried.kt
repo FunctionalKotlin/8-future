@@ -1,5 +1,9 @@
 // Copyright © FunctionalKotlin.com 2017. All rights reserved.
 
+fun <A, B, C, D, E, F, G> ((A, B, C, D, E, F) -> G)
+    .curried(): (A) -> (B) -> (C) -> (D) -> (E) -> (F) -> G =
+    { a -> { b -> { c -> { d -> { e -> { f -> this(a, b, c, d, e, f) } } } } } }
+
 fun <A, B, C, D, E, F> ((A, B, C, D, E) -> F)
     .curried(): (A) -> (B) -> (C) -> (D) -> (E) -> F =
     { a -> { b -> { c -> { d -> { e -> this(a, b, c, d, e) } } } } }
