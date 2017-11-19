@@ -14,14 +14,13 @@ fun <A> asyncFuture(getValue: () -> A): Future<A> =
         getValue()
     })
 
-fun main(args: Array<String>) {
-    val future = asyncFuture { 23 + 19 }
-
+fun <A> Future<A>.runAsync(onComplete: (A) -> Unit) {
     launch(CommonPool) {
-        val number = future.task.await()
-
-        println(number)
+        onComplete(task.await())
     }
+}
 
-    Thread.sleep(2000)
+fun main(args: Array<String>) {
+    asyncFuture { 23 + 19 }
+        .runAsync(::println)
 }
