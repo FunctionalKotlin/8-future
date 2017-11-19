@@ -22,6 +22,6 @@ fun createUser(
         ::User.curried() map
             Name(name) ap
             Password(password) ap
-            pure(premium) ap
-            pure(newsletter) bind
+            Result.pure(premium) ap
+            Result.pure(newsletter) bind
             (Premium or Newsletter)

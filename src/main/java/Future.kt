@@ -7,7 +7,12 @@ import kotlinx.coroutines.experimental.launch
 
 typealias FutureTask<A> = Deferred<A>
 
-class Future<out A>(val task: FutureTask<A>)
+class Future<out A>(val task: FutureTask<A>) {
+    companion object
+}
+
+fun <A> Future.Companion.pure(a: A): Future<A> =
+    Future(async(CommonPool) { a })
 
 fun <A> asyncFuture(getValue: () -> A): Future<A> =
     Future(async(CommonPool) {
