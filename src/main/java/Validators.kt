@@ -1,6 +1,7 @@
 // Copyright © FunctionalKotlin.com 2017. All rights reserved.
 
-typealias Validator<A, E> = (A) -> Future<Result<A, E>>
+typealias AsyncResult<A, E> = Future<Result<A, E>>
+typealias Validator<A, E> = (A) -> AsyncResult<A, E>
 
 infix operator fun <T, E> (Validator<T, E>).plus(
     validator: Validator<T, E>): Validator<T, E> = {
@@ -27,9 +28,6 @@ fun <A> validate(with: (A) -> Boolean): (A) -> A? = { it.takeIf(with) }
 infix fun <A, E> ((A) -> A?).orElseFail(with: E): Validator<A, E> = { a ->
     asyncFuture { this(a)?.let(::Success) ?: Failure(with) }
 }
-
-fun <A, E> allOf(vararg validators: Validator<A, E>): Validator<A, E> =
-    validators.fold(::Success) { acc, validator -> acc + validator }
 
 object Validators {
     val Name: Validator<String, UserError> =

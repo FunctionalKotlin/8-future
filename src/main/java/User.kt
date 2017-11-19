@@ -18,10 +18,10 @@ enum class UserError {
 
 fun createUser(
     name: String, password: String, premium: Boolean,
-    newsletter: Boolean): Result<User, UserError> =
+    newsletter: Boolean): AsyncResult<User, UserError> =
         ::User.curried() map
             Name(name) ap
             Password(password) ap
-            Result.pure(premium) ap
-            Result.pure(newsletter) bind
+            Future.pure(Result.pure(premium)) ap
+            Future.pure(Result.pure(newsletter)) bind
             (Premium or Newsletter)

@@ -1,3 +1,6 @@
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.async
+
 // Copyright © FunctionalKotlin.com 2017. All rights reserved.
 
 sealed class Result<out A, out E> {
@@ -28,10 +31,23 @@ fun <A, E> Result<A, E>.ifSuccess(execute: (A) -> Unit) {
 }
 
 infix fun <A, B, E> ((A) -> B).map(
-    result: Result<A, E>): Result<B, E> = result.map(this)
+    asyncResult: AsyncResult<A, E>): AsyncResult<B, E> =
+        asyncResult.map { it.map(this) }
 
-infix fun <A, B, E> Result<(A) -> B, E>.ap(
-    result: Result<A, E>): Result<B, E> = result.apply(this)
+infix fun <A, B, E> AsyncResult<(A) -> B, E>.ap(
+    asyncResult: AsyncResult<A, E>): AsyncResult<B, E> =
+        Future(async(CommonPool) {
+            val resultAB = this@ap.task.await()
+            val resultA = asyncResult.task.await()
 
-infix fun <A, E, B> Result<A, E>.bind(
-    transform: (A) -> Result<B, E>): Result<B, E> = flatMap(transform)
+            resultA.apply(resultAB)
+        })
+
+infix fun <A, E, B> AsyncResult<A, E>.bind(
+    transform: (A) -> AsyncResult<B, E>): AsyncResult<B, E> =
+        this.flatMap {
+            when(it) {
+                is Success -> transform(it.value)
+                is Failure -> Future.pure(it)
+            }
+        }

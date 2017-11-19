@@ -45,15 +45,6 @@ fun <A, B> Future<A>.apply(futureAB: Future<(A) -> B>): Future<B> =
         ab(a)
     })
 
-infix fun <A, B> ((A) -> B).map(future: Future<A>): Future<B> =
-    future.map(this)
-
-infix fun <A, B> Future<(A) -> B>.ap(future: Future<A>): Future<B> =
-    future.apply(this)
-
-infix fun <A, B> Future<A>.bind(transform: (A) -> Future<B>): Future<B> =
-    flatMap(transform)
-
 fun main(args: Array<String>) {
     asyncFuture { 23 + 19 }
         .map { it + 3 }
