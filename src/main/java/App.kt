@@ -63,16 +63,16 @@ fun main(args: Array<String>) {
             println(user) // User(firstname: "Megan", lastName: "Sanchez")
         }
 
-    topFive().flatMap { topFive ->
+    val average = topFive().flatMap { topFive ->
         ::average.curried() map
             lastPostWordCount(topFive[0]) ap
             lastPostWordCount(topFive[1]) ap
             lastPostWordCount(topFive[2]) ap
             lastPostWordCount(topFive[3]) ap
             lastPostWordCount(topFive[4])
-    }.runAsync {
-        println(it)
-    }
+    }.runSync()
+
+    println(average)
 
     Thread.sleep(2000)
 }

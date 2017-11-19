@@ -1,9 +1,6 @@
 // Copyright © FunctionalKotlin.com 2017. All rights reserved.
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.*
 
 typealias FutureTask<A> = Deferred<A>
 
@@ -24,6 +21,9 @@ fun <A> Future<A>.runAsync(onComplete: (A) -> Unit) {
         onComplete(task.await())
     }
 }
+
+fun <A> Future<A>.runSync(): A =
+    runBlocking { this@runSync.task.await() }
 
 fun <A, B> Future<A>.map(transform: (A) -> B): Future<B> =
     flatMap {
