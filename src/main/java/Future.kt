@@ -20,7 +20,13 @@ fun <A> Future<A>.runAsync(onComplete: (A) -> Unit) {
     }
 }
 
+fun <A, B> Future<A>.map(transform: (A) -> B): Future<B> =
+    Future(async(CommonPool) {
+        transform(this@map.task.await())
+    })
+
 fun main(args: Array<String>) {
     asyncFuture { 23 + 19 }
+        .map { it + 3 }
         .runAsync(::println)
 }
